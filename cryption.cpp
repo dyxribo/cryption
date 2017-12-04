@@ -1,9 +1,6 @@
 #include <iostream>
-#include <stdlib.h>
 #include <string>
 #include <fstream>
-#include <locale>
-#include <direct.h>
 #include <errno.h>
 #include <unistd.h>
 #include <Windows.h>
@@ -16,6 +13,7 @@ int ERROR_CREATING_PKDIR = 3;
 int ERROR_GETTING_CWD = 4;
 int ERROR_OPENING_FILE = 5;
 int FILE_DOES_NOT_EXIST = 6;
+int DELETE_FILE_ERROR = 7;
 
 using namespace std;
 
@@ -154,7 +152,7 @@ string decrypt(string msg, string const &key)
 }
 
 // sets the executable working directory (windows only, only reason it's not cross platform. i'll get a PC for GNU/linux soon, probably).
-void setWorkingDirectory()
+string setWorkingDirectory()
 {
     TCHAR pBuf[MAX_PATH];
     int bytes = GetModuleFileName(NULL, pBuf, MAX_PATH);
@@ -205,6 +203,11 @@ void showUsageError()
          << "cryption "
          << "[GET] "
          << "[IDENTIFIER] "
+         << "[KEY]" << endl
+         << "OR" << endl
+         << "cryption "
+         << "[DEL] "
+         << "[IDENTIFIER] "
          << "[KEY]" << endl;
 }
 
@@ -224,8 +227,7 @@ void checkForPrivateKey(string name)
     {
         if (access(name.c_str(), F_OK) == -1)
         {
-            cerr << "that private key does not exist. check spelling.\n";
-            showUsageError();
+            cerr << "that private key does not exist.\n";
             exit(FILE_DOES_NOT_EXIST);
         }
     }
@@ -234,8 +236,8 @@ void checkForPrivateKey(string name)
 
 int main(int numArgs, char *argVector[])
 {
-    // make sure there is enough arguments to at least check if the operation is supposed to be get or set
-    if (numArgs < 4)
+    // make sure there is the minimum amount of arguments at least
+    if (numArgs < 3)
     {
         showUsageError();
         return NOT_ENOUGH_ARGS;
@@ -254,8 +256,8 @@ int main(int numArgs, char *argVector[])
     // create a variable for the operation name for ease of access
     string operationName = argVector[1];
 
-    // check for argument errors; make sure the operation name isn't something other than "add" or "get"
-    if (!(operationName == "get") && !(operationName == "add"))
+    // check for argument errors; make sure the operation name isn't something other than "add", "get", or "del"
+    if (!(operationName == "get") && !(operationName == "add") && !(operationName == "del"))
     {
         showUsageError();
         return INCORRECT_ARGS;
@@ -263,7 +265,8 @@ int main(int numArgs, char *argVector[])
 
     // sets a variable based on whether the operation is get or set
     bool isGet = (operationName == "get");
-    
+    bool isDel = (operationName == "del");
+
     //sets the working directory for file operations
     setWorkingDirectory();
 
@@ -274,8 +277,8 @@ int main(int numArgs, char *argVector[])
         checkForPrivateKey((string)argVector[2]);
 
         // load the file
-        ifstream storedEncrypt("pk/" + (string)argVector[2]);
-        
+        ifstream storedEncrypt("pk\\" + (string)argVector[2]);
+
         // make a variable for storing the characters from the file
         string line;
 
@@ -289,14 +292,9 @@ int main(int numArgs, char *argVector[])
                 contents = contents + line;
             }
 
-            // print out the encrypted and decrypted message to the user; 
+            // print out the encrypted and decrypted message to the user;
             // if decrypt is given the wrong key, the message will not be correct
-            cout << "before decryption: \n\n"
-                 << "\"" + contents + "\"\n\n"
-                 << "after decryption: \n\n"
-                 << "\"" + decrypt(contents, argVector[3]) + "\"\n\n";
-            cout << "message decrypted.\n"
-                 << endl;
+            cout << decrypt(contents, argVector[3]) << endl;
             storedEncrypt.close();
         }
         else // if the file is not open...
@@ -306,7 +304,7 @@ int main(int numArgs, char *argVector[])
             return ERROR_OPENING_FILE;
         }
     }
-    else // if the operation is a "set" operation (for setting the encrypted keys)
+    else if (!isGet && !isDel) // if the operation is a "set" operation (for setting the encrypted keys)
     {
         // if there are less than 5 args, set operations cant be run
         if (numArgs < 5)
@@ -335,7 +333,27 @@ int main(int numArgs, char *argVector[])
             // error tiiiime!
             cerr << "unable to open file.\n";
             return ERROR_OPENING_FILE;
-        }    
+        }
+    }
+    else // otherwise, the operation is definitely a "del" (delete) operation
+    {
+        // store the relative file path of the file to delete as a const char for remove()
+        const char *fileToDelete = ("pk\\" + (string)argVector[2]).c_str();
+
+        // check to see if the pk even exists before starting
+        checkForPrivateKey((string)argVector[2]);
+
+        // attempt to delete the key
+        if (remove(fileToDelete) == 0)
+        {
+            cout << "private key successfully deleted." << endl;
+        }
+        else // if it doesn't work, what do we do?
+        {
+            // that's right, throw that error like a football at the superbowl!
+            cerr << "there was a problem deleting the private key (" << fileToDelete << ").";
+            return DELETE_FILE_ERROR;
+        }
     }
     // program complete with no errors!
     return 0;
