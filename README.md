@@ -14,7 +14,7 @@ cryption [GET] [IDENTIFIER] [KEY]
 OR 
 
 ```
-cryption [DEL] [IDENTIFIER] [KEY]
+cryption [DEL] [IDENTIFIER]
 ```
 
 where:
@@ -33,9 +33,16 @@ where:
 
 ## how it works
 
-cryption first XORs ```[MESSAGE]```` using ```[KEY]```. then it base64-encrypts the result.
+cryption first XORs ```[MESSAGE]``` using ```[KEY]```. 
+then, it base64-encrypts the result, and saves the file in a folder called "pk" located in the same directory as cryption.
+
+suggestion: add cryption to your windows PATH variable in order to call cryption from anywhere, and make keys with ease.
 
 ## example
+
+What an encrypted message looks like
+
+```""%/#;@:x(1>> 0!$```
 
 Adding a private key
 
