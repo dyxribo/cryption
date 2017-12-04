@@ -11,12 +11,19 @@ OR
 ```
 cryption [GET] [IDENTIFIER] [KEY]
 ```
+OR 
+
+```
+cryption [DEL] [IDENTIFIER] [KEY]
+```
 
 where:
 
 * ```[ADD]``` tells cryption that you want to create a private key
 
 * ```[GET]``` tells cryption that you want to retrieve a private key
+
+* ```[DEL]``` tells cryption to delete a private key it previously created
 
 * ```[IDENTIFIER]``` sets the name of the private key in order to retrieve it later
 
