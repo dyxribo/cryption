@@ -17,6 +17,7 @@ int DELETE_FILE_ERROR = 7;
 
 using namespace std;
 
+
 // characters used for the b64 encryption.
 static const string base64_chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -152,7 +153,7 @@ string decrypt(string msg, string const &key)
 }
 
 // sets the executable working directory (windows only, only reason it's not cross platform. i'll get a PC for GNU/linux soon, probably).
-string setWorkingDirectory()
+void setWorkingDirectory()
 {
     TCHAR pBuf[MAX_PATH];
     int bytes = GetModuleFileName(NULL, pBuf, MAX_PATH);
@@ -236,7 +237,7 @@ void checkForPrivateKey(string name)
 
 int main(int numArgs, char *argVector[])
 {
-    // make sure there is the minimum amount of arguments at least
+    // make sure there is the minimum amount of arguments at least to do a delete operation
     if (numArgs < 3)
     {
         showUsageError();
@@ -263,7 +264,7 @@ int main(int numArgs, char *argVector[])
         return INCORRECT_ARGS;
     }
 
-    // sets a variable based on whether the operation is get or set
+    // sets a variable based on whether the operation is get or add
     bool isGet = (operationName == "get");
     bool isDel = (operationName == "del");
 
@@ -273,6 +274,14 @@ int main(int numArgs, char *argVector[])
     // if the operation is a "get" operation (for getting the encrypted keys)
     if (isGet)
     {
+         // if there are less than 4 args, get operations cant be run
+        if (numArgs < 4)
+        {
+            cout << "not enough args for \"get\"." << endl;
+            showUsageError();
+            return NOT_ENOUGH_ARGS;
+        }
+
         // check if the private key (pk) specified by the user exists
         checkForPrivateKey((string)argVector[2]);
 
@@ -294,7 +303,7 @@ int main(int numArgs, char *argVector[])
 
             // print out the encrypted and decrypted message to the user;
             // if decrypt is given the wrong key, the message will not be correct
-            cout << decrypt(contents, argVector[3]) << endl;
+            cout << "\"" << decrypt(contents, argVector[3]) << "\"" << endl;
             storedEncrypt.close();
         }
         else // if the file is not open...
@@ -304,9 +313,9 @@ int main(int numArgs, char *argVector[])
             return ERROR_OPENING_FILE;
         }
     }
-    else if (!isGet && !isDel) // if the operation is a "set" operation (for setting the encrypted keys)
+    else if (!isGet && !isDel) // if the operation is a "add" operation (for setting the encrypted keys)
     {
-        // if there are less than 5 args, set operations cant be run
+        // if there are less than 5 args, add operations cant be run
         if (numArgs < 5)
         {
             cout << "not enough args for \"add\"." << endl;
@@ -337,14 +346,14 @@ int main(int numArgs, char *argVector[])
     }
     else // otherwise, the operation is definitely a "del" (delete) operation
     {
-        // store the relative file path of the file to delete as a const char for remove()
-        const char *fileToDelete = ("pk\\" + (string)argVector[2]).c_str();
-
         // check to see if the pk even exists before starting
         checkForPrivateKey((string)argVector[2]);
-
+        
+        // store the relative file path of the file to delete as a const char for remove()
+        string fileToDelete = ("pk\\" + (string)argVector[2]);
+        
         // attempt to delete the key
-        if (remove(fileToDelete) == 0)
+        if (remove(fileToDelete.c_str()) == 0)
         {
             cout << "private key successfully deleted." << endl;
         }
