@@ -33,7 +33,7 @@ cryption first XORs ```[MESSAGE]```` using ```[KEY]```. then it base64-encrypts 
 Adding a private key
 
 ```
-C:\Users\SnaiLegacy>cryption add test ThisIsATestMessageAndOrPassPhrase testkey
+C:\Users\SnaiLegacy>cryption add test TestPassw0rd123!@# testKey
 message successfully encrypted.
 
 C:\Users\SnaiLegacy>
@@ -42,19 +42,17 @@ C:\Users\SnaiLegacy>
 Retrieving a private key
 
 ```
-C:\Users\SnaiLegacy>cryption get test testkey
-before decryption:
-
-"""U4%&J&+),% #%<P V9%2=704<!:        "
-
-after decryption:
-
-"ThisIsATestMessageAndOrPassPhrase"
-
-message decrypted.
-
+C:\Users\SnaiLegacy>cryption get test testKey
+TestPassw0rd123!@#
 
 C:\Users\SnaiLegacy>
 ```
 
-currently wondering if i should take out the retrieval message and just put the unencrypted string for development purposes, such as if someone wanted to use the output automatically from another program. i'll probably do it anyway.
+Deleting a private key
+
+```
+C:\Users\SnaiLegacy>cryption del test
+private key successfully deleted.
+
+C:\Users\SnaiLegacy>
+```
