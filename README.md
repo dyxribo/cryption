@@ -68,5 +68,5 @@ Deleting a private key
 C:\Users\SnaiLegacy>cryption del test
 private key successfully deleted.
 
-C:\Users\SnaiLegacy>
+C:\Users\dyxribo>
 ```
