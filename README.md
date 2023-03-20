@@ -47,19 +47,19 @@ What an encrypted message looks like
 Adding a private key
 
 ```
-C:\Users\SnaiLegacy>cryption add test TestPassw0rd123!@# testKey
+C:\Users\dyxribo>cryption add test TestPassw0rd123!@# testKey
 message successfully encrypted.
 
-C:\Users\SnaiLegacy>
+C:\Users\dyxribo>
 ```
 
 Retrieving a private key
 
 ```
-C:\Users\SnaiLegacy>cryption get test testKey
+C:\Users\dyxribo>cryption get test testKey
 TestPassw0rd123!@#
 
-C:\Users\SnaiLegacy>
+C:\Users\dyxribo>
 ```
 
 Deleting a private key
